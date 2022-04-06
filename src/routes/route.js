@@ -1,33 +1,34 @@
 const express = require('express');
-const logger = require('./logger')
+const logger = require('../logger/logger')
+const helper = require('../util/helper')
+const formater = require('../validator/formatter')
+const loadash = require('../loadash/loadash')
 
 const router = express.Router();
 
 router.get('/test-me', function (req, res) {
-    console.log('I am inside the first route handler')
-    console.log('The endpoint value is', logger.endpoint)
-    console.log('Calling log function')
-    logger.logging()
+    console.log(logger.welcom())
+    // ---------------------------------
+    console.log(helper.printDate())
+    console.log(helper.printMonth())
+    console.log(helper.getBatchInfo("Uranium", 2, 3, "Nodejs module system"))
+
+    // ------------------------------------
+    console.log(formater.trim(" FubctionUp "))
+    console.log(formater.changetoLowerCase("FubctionUp"))
+    console.log(formater.changetoUpperCase("FubctionUp"))
+
     res.send('My first ever api!')
 });
 
-router.get('/test-me2', function (req, res) {
-    console.log('I am inside the second route handler')
-    res.send('My second ever api!')
-});
+router.get('/hello', (req, res) => {
+    console.log(loadash.useOfChunk())
+    console.log(loadash.useOftail())
+    console.log(loadash.useOfUnion())
+    console.log(loadash.useOffromPairs(["horror", "The Shining"], ["drama", "Titanic"], ["thriller", "Shutter Island"], ["fantasy", "Pans Labyrinth"]))
+    res.send("Hello")
+})
 
-
-router.get('/test-me5', function (req, res) {
-    res.send('My final ever api!')
-});
-
-router.get('/test-me3', function (req, res) {
-    res.send('My first ever api!')
-});
-
-router.get('/test-me4', function (req, res) {
-    res.send('My first ever api!')
-});
 
 module.exports = router;
 // adding this comment for no reason
