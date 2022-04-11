@@ -1,59 +1,51 @@
-let ObjArr = [{
-        name: "manish",
-        dob: "1/1/1995",
-        gender: "male",
-        city: "jalandhar",
-        sports: [
-            "swimming"
-        ]
-    },
-    {
-        name: "gopal",
-        dob: "1/09/1995",
-        gender: "male",
-        city: "delhi",
-        sports: [
-            "soccer"
-        ]
-    },
-    {
-        name: "lokesh",
-        dob: "1/1/1990",
-        gender: "male",
-        city: "mumbai",
-        sports: [
-            "soccer"
-        ]
-    }
-]
+const userModel = require('../models/userModel')
 
 
-
-let savePlayer = function (req, res) {
-    let outPut = {
+let saveUser = async (req, res) => {
+    let data = req.body
+    let output = {
         status: false,
-        data: "Something went wrong, Check your code."
+        data: "Something went wrong..."
     }
-    let body = req.body;
-    // find Name 
-    let find = ObjArr.find((eachObject) => {
-        if (eachObject.name == body.name) return true;
+
+    // lets save data <--------------------
+    await userModel.create(data).then((success) => {
+        output = {
+            status: true,
+            data: "User Data Saved: " + success._id
+        };
+    }, (error) => {
+        output = {
+            status: true,
+            data: "User Data Can't Saved"
+        };
     })
 
-
-    if (find) {
-        outPut = {
-            status: false,
-            data: "This player name is already exist..., Try anather one."
-        }
-    } else {
-        ObjArr.push(body);
-        outPut = {
-            status: true,
-            data: ObjArr
-        }
-    }
-    res.send(outPut)
+    res.send(output)
 }
 
-module.exports.savePlayers = savePlayer
+
+let listUser = async (req, res) => {
+    let output = {
+        status: false,
+        data: "Something went wrong..."
+    }
+
+    // lets list of all datas <------------------
+    await userModel.find().then((success) => {
+        output = {
+            status: true,
+            data: success
+        }
+    }, (error) => {
+        output = {
+            status: true,
+            data: "User Data Can't Saved"
+        };
+    })
+
+    res.send(output)
+}
+
+module.exports.saveUser = saveUser
+module.exports.listUser = listUser
