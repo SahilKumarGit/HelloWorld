@@ -10,11 +10,23 @@ let bookSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    category: String,
-    year: Number
+    date: {
+        type: Date,
+        default: Date.now()
+    },
+    tags: [String],
+    isPublished: Boolean,
+    price: {
+        IN: String,
+        EURO: String
+    },
+    sales: {
+        type: Number,
+        default: 10
+    }
 }, {
     timestamps: true
 })
 
-
+// old
 module.exports = mongoose.model('Book', bookSchema); //books
