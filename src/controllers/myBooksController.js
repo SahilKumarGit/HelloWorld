@@ -1,185 +1,165 @@
 const bookSchema = require('../models/bookModel')
+const autherSchema = require('../models/authorModule')
+
+
+
+/*------------------------------------------------------------
+📑 -> create auther 
+------------------------------------------------------------*/
+
+let createAuthor = async (req, res) => {
+    let data = req.body;
+    // create new auth document
+    let result = await autherSchema.create(data)
+        .then((success) => {
+            return {
+                status: true,
+                data: success
+            }
+        }, (err) => {
+            return {
+                status: false,
+                data: err.message
+            }
+        });
+
+    res.send(result);
+}
+
+
+
+/*------------------------------------------------------------
+📑 -> create books
+------------------------------------------------------------*/
+
 let createBook = async (req, res) => {
     let data = req.body;
-    let output = await bookSchema.create(data).then((success) => {
-        return {
-            status: true,
-            data: success
-        }
-    }, (err) => {
-        return {
-            status: false,
-            data: err.message
-        }
-    });
-    res.send(output)
-}
+    let result = {
+        status: false,
+        message: "Something wents worng"
+    }
 
-
-let updateBook = async (req, res) => {
-    let data = req.body;
-    // replace findOneAndUpdate with updateOne, updateMany and more
-    let output = await bookSchema.findOneAndUpdate({ //condition
-            year: 2002
-        }, //condition
-        { //data that update
-            $set: data
-        }, //data that update
-        {
-            new: true, //give updated data
-            upsert: true //if not find then create new...
-        }
-    ).then((success) => {
-        return {
-            status: true,
-            data: success
-        }
-    }, (err) => {
-        return {
-            status: false,
-            data: err.message
-        }
-    });
-    res.send(output)
-}
-
-let deleteBook = async (req, res) => {
-    let data = req.body;
-    let output = await bookSchema.updateMany({
-        year: 2002
-    }, {
-        $set: {
-            isDelete: true
-        }
+    // check auther already exist or not
+    let autherExist = await autherSchema.findOne({
+        author_id: data.author_id
     }).then((success) => {
-        return {
-            status: true,
-            data: success
-        }
+        return success === null ? false : true
     }, (err) => {
-        return {
+        return false
+    })
+
+    if (autherExist) {
+        // create new book doc
+        result = await bookSchema.create(data)
+            .then((success) => {
+                return {
+                    status: true,
+                    data: success
+                }
+            }, (err) => {
+                return {
+                    status: false,
+                    data: err.message
+                }
+            });
+    } else {
+        result = {
             status: false,
-            data: err.message
+            message: "No auther found related your auther_id, Please enter currect one."
         }
-    });
-    res.send(output)
+    }
+
+
+
+
+    res.send(result);
 }
 
 
-let bookList = async (req, res) => {
 
-    let output = await bookSchema.find().select({
-        bookName: 1,
-        authorName: 1,
-        _id: 0
+/*------------------------------------------------------------
+📑 -> get book list related Chetan Bhagat
+------------------------------------------------------------*/
+
+let chetanBhagatBookList = async (req, res) => {
+    let result = {
+        status: false,
+        message: "Something wents worng"
+    }
+
+    // check auther already exist or not if exist then fatch the auther_id 🔎🔎
+    let autherExist = await autherSchema.findOne({
+        author_name: "Chetan Bhagat"
     }).then((success) => {
-        return {
-            status: true,
-            data: success
-        }
+        return success === null ? false : success.author_id;
     }, (err) => {
-        return {
+        return false
+    })
+
+    if (autherExist) {
+        // find book related auther is 🤯🤯
+        result = await bookSchema.find({
+                author_id: autherExist
+            })
+            .then((success) => {
+                return {
+                    status: true,
+                    data: success
+                }
+            }, (err) => {
+                return {
+                    status: false,
+                    data: err.message
+                }
+            });
+    } else {
+        result = {
             status: false,
-            data: "Something went worng...."
+            message: "No auther found related your auther_id, Please enter currect one."
         }
-    });
-    res.send(output)
+    }
+
+
+
+
+    res.send(result);
 }
 
-let getBooksInYear = async (req, res) => {
-    let data = req.body;
 
-    let output = await bookSchema.find({
-        year: data.year
-    }).select({
-        bookName: 1,
-        authorName: 1,
-        _id: 0
-    }).then((success) => {
-        return {
-            status: true,
-            data: success
-        }
-    }, (err) => {
-        return {
-            status: false,
-            data: "Something went worng...."
-        }
-    });
-    res.send(output)
-}
 
-let getParticularBooks = async (req, res) => {
-    let data = req.body;
+/*------------------------------------------------------------
+📑 -> update Two states book prive value
+------------------------------------------------------------*/
 
-    let output = await bookSchema.find(data).then((success) => {
-        return {
-            status: true,
-            data: success
-        }
-    }, (err) => {
-        return {
-            status: false,
-            data: "Something went worng...."
-        }
-    });
-    res.send(output)
-}
-
-let getXINRBooks = async (req, res) => {
-
-    let output = await bookSchema.find({
-        $or: [{
-            'price.indian': 100
+let updateTwoStates = async (req, res) => {
+    // update data of book name Two states 's price to 100
+    let result = await bookSchema.findOneAndUpdate({
+            name: "Two states"
         }, {
-            'price.indian': 200
-        }, {
-            'price.indian': 500
-        }]
-    }).then((success) => {
-        return {
-            status: true,
-            data: success
-        }
-    }, (err) => {
-        return {
-            status: false,
-            data: "Something went worng...."
-        }
-    });
-    res.send(output)
-}
-
-let getRandomBooks = async (req, res) => {
-
-    let output = await bookSchema.find({
-        $or: [{
-            stockAvailable: true
-        }, {
-            totalPages: {
-                $gt: 500
+            $set: {
+                price: 100
             }
-        }]
-    }).then((success) => {
-        return {
-            status: true,
-            data: success
-        }
-    }, (err) => {
-        return {
-            status: false,
-            data: "Something went worng...."
-        }
-    });
-    res.send(output)
+        }, {
+            new: true
+        })
+        .then((success) => {
+            return {
+                status: true,
+                data: success
+            }
+        }, (err) => {
+            return {
+                status: false,
+                data: err.message
+            }
+        });
+
+    res.send(result);
 }
 
 
+// export all functions...
+module.exports.createAuthor = createAuthor;
 module.exports.createBook = createBook;
-module.exports.updateBook = updateBook;
-module.exports.deleteBook = deleteBook;
-module.exports.bookList = bookList;
-module.exports.getBooksInYear = getBooksInYear;
-module.exports.getParticularBooks = getParticularBooks;
-module.exports.getXINRBooks = getXINRBooks;
-module.exports.getRandomBooks = getRandomBooks;
+module.exports.chetanBhagatBookList = chetanBhagatBookList;
+module.exports.updateTwoStates = updateTwoStates;
