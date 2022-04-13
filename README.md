@@ -83,8 +83,6 @@ const router = express.Router();
                    ]
                },
            ]
-```
- ```jacascript
            router.post('/players', function (req, res) {
 
                //LOGIC WILL COME HER
