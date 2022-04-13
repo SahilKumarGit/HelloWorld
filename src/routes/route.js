@@ -30,6 +30,8 @@ create the following API’s (write logic in bookController and routes in routes
 
 
 router.post('/createBook', booksController.createBook)
+router.post('/updateBook', booksController.updateBook)
+router.post('/deleteBook', booksController.deleteBook)
 router.get('/bookList', booksController.bookList)
 router.post('/getBooksInYear', booksController.getBooksInYear)
 router.post('/getParticularBooks', booksController.getParticularBooks)

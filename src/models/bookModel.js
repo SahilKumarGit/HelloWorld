@@ -20,7 +20,8 @@ let bookSchema = new mongoose.Schema({
     stockAvailable: {
         type: Boolean,
         default: false
-    }
+    },
+    isDelete: Boolean
 }, {
     timestamps: true
 })

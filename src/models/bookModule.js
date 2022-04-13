@@ -23,7 +23,8 @@ let bookSchema = new mongoose.Schema({
     sales: {
         type: Number,
         default: 10
-    }
+    },
+    summery:mongoose.Schema.Types.Mixed
 }, {
     timestamps: true
 })

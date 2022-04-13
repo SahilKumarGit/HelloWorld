@@ -9,7 +9,57 @@ let createBook = async (req, res) => {
     }, (err) => {
         return {
             status: false,
-            data: "Something went worng...."
+            data: err.message
+        }
+    });
+    res.send(output)
+}
+
+
+let updateBook = async (req, res) => {
+    let data = req.body;
+    // replace findOneAndUpdate with updateOne, updateMany and more
+    let output = await bookSchema.findOneAndUpdate({ //condition
+            year: 2002
+        }, //condition
+        { //data that update
+            $set: data
+        }, //data that update
+        {
+            new: true, //give updated data
+            upsert: true //if not find then create new...
+        }
+    ).then((success) => {
+        return {
+            status: true,
+            data: success
+        }
+    }, (err) => {
+        return {
+            status: false,
+            data: err.message
+        }
+    });
+    res.send(output)
+}
+
+let deleteBook = async (req, res) => {
+    let data = req.body;
+    let output = await bookSchema.updateMany({
+        year: 2002
+    }, {
+        $set: {
+            isDelete: true
+        }
+    }).then((success) => {
+        return {
+            status: true,
+            data: success
+        }
+    }, (err) => {
+        return {
+            status: false,
+            data: err.message
         }
     });
     res.send(output)
@@ -126,6 +176,8 @@ let getRandomBooks = async (req, res) => {
 
 
 module.exports.createBook = createBook;
+module.exports.updateBook = updateBook;
+module.exports.deleteBook = deleteBook;
 module.exports.bookList = bookList;
 module.exports.getBooksInYear = getBooksInYear;
 module.exports.getParticularBooks = getParticularBooks;
