@@ -1,5 +1,6 @@
-##ASSIGNMENT : ( don't use ref and populate)##
-###You have to replicate the below data in your database. With this in mind, create a node application and APIs to do the following:###
+## ASSIGNMENT : ( don't use ref and populate )
+
+### You have to replicate the below data in your database. With this in mind, create a node application and APIs to do the following:
 
 1. Write down the schemas for **book** and **authors** (keeping the data given below in mind). Also create the documents (corresponding to the data given below) in your database.
 2. CRUD operations. Write API's to do the following:
@@ -10,12 +11,11 @@
    bookModel.find( { price : { $gte: 50}  ,  price: {$lte: 100} } ) // WRONG
    bookModel.find( { price : { $gte: 50, $lte: 100} } ).select({ author_id :1})..run a map(or forEach) loop and get all the authorName corresponding to the authorId’s ( by querying authorModel)
 
-##DATA:##
+## DATA:
 
-// \_id:ObjectId("8781263871293"), \_id will be automatically generated
-Authors:
-{
-
+**// \_id:ObjectId("8781263871293"), \_id will be automatically generated**
+### Authors:
+    {
         author_id:1,
         author_name:"Chetan Bhagat",
         age:25,
@@ -34,13 +34,13 @@ Authors:
         address:"Tamilnadu"
     }
 
-Books:
-{
-name:"Two states",
-author_id:1,
-price:50,
-ratings:4.5,
-} ,
+### Books:
+    {
+      name:"Two states",
+      author_id:1,
+      price:50,
+      ratings:4.5,
+    } ,
 
     {
         name:"Five Point Someone",
