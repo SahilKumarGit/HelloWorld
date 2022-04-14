@@ -1,13 +1,13 @@
 const express = require('express');
-const booksController = require('../controllers/myBooksController')
+const bookController = require('../controllers/bookCollection')
 const router = express.Router();
 
 
-router.post('/createAuthor', booksController.createAuthor)
-router.post('/createBook', booksController.createBook)
-router.get('/allList', booksController.allList)
 
-
+router.post('/createPublisher', bookController.createPublisher)
+router.post('/createAuthor', bookController.createAuthor)
+router.post('/createBook', bookController.createBook)
+router.get('/bookList', bookController.bookList)
 
 
 
