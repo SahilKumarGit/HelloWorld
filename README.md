@@ -1,104 +1,74 @@
-Assignments(Structure of the routes file would look like what is given at the bottom of the document):
-You have to write a POST api:
-Write the api in first project directory (Routes/index.js or routes/route.js)
-Problem Statement  :
-NOTE: you must create the players array outside( on the top ) of the api( so that data is maintained across api hits )
-Your player collection should be an ARRAY of player objects. Each player object should have the following attributes:
+##ASSIGNMENT : ( don't use ref and populate)##
+###You have to replicate the below data in your database. With this in mind, create a node application and APIs to do the following:###
+
+1. Write down the schemas for **book** and **authors** (keeping the data given below in mind). Also create the documents (corresponding to the data given below) in your database.
+2. CRUD operations. Write API's to do the following:
+   Write create APIs for both **books** and **authors** ---> If author_id is not available then do not accept the entry(in neither the author collection nor the **books** collection)
+   List out the **books** written by "Chetan Bhagat" ( this will need 2 DB queries one after another- first query will find the author_id for "Chetan Bhagat”. Then next query will get the list of **books** with that author_id )
+   find the author of “Two states” and update the book price to 100; Send back the author_name and updated price in response. ( This will also need 2 queries- 1st will be a findOneAndUpdate. The second will be a find query aith author_id from previous query)
+   Find the **books** which costs between 50-100(50,100 inclusive) and respond back with the author names of respective **books**..
+   bookModel.find( { price : { $gte: 50}  ,  price: {$lte: 100} } ) // WRONG
+   bookModel.find( { price : { $gte: 50, $lte: 100} } ).select({ author_id :1})..run a map(or forEach) loop and get all the authorName corresponding to the authorId’s ( by querying authorModel)
+
+##DATA:##
+
+// \_id:ObjectId("8781263871293"), \_id will be automatically generated
+Authors:
 {
-"name": "manish",
-"dob": "1/1/1995",
-"gender": "male",
-"city": "jalandhar",
-"sports": [
-"swimming"
-]
-}
-e.g. the players array would look like this:
-let players =
-   [
-       {
-           "name": "manish",
-           "dob": "1/1/1995",
-           "gender": "male",
-           "city": "jalandhar",
-           "sports": [
-               "swimming"
-           ],
-       },
-       {
-           "name": "gopal",
-           "dob": "1/09/1995",
-           "gender": "male",
-           "city": "delhi",
-           "sports": [
-               "soccer"
-           ]
-       },
-       {
-           "name": "lokesh",
-           "dob": "1/1/1990",
-           "gender": "male",
-           "city": "mumbai",
-           "sports": [
-               "soccer"
-           ]
-       },
-   ]
- 
-Write a POST /players api that creates a new player ( that saves a player’s details and doesn’t allow saving the data of a player with a name that already exists in the data)
 
-NOTE: you must create the players array outside( on the top ) of the api( so that data is maintained across api hits)
+        author_id:1,
+        author_name:"Chetan Bhagat",
+        age:25,
+        address:"New delhi"
+    } ,
+    {
+        author_id:2,
+        author_name:"J.k Rowling",
+        age:60,
+        address:"Britain"
+    } ,
+    {
+        author_id:3,
+        author_name:"Ramanujan",
+        age:100,
+        address:"Tamilnadu"
+    }
 
+Books:
+{
+name:"Two states",
+author_id:1,
+price:50,
+ratings:4.5,
+} ,
 
-
-
-—----------------
-
-The file inside routes would look like this:
-
-const express = require('express');
-const router = express.Router();
- 
-let players =
-   [
-       {
-           "name": "manish",
-           "dob": "1/1/1995",
-           "gender": "male",
-           "city": "jalandhar",
-           "sports": [
-               "swimming"
-           ]
-       },
-       {
-           "name": "gopal",
-           "dob": "1/09/1995",
-           "gender": "male",
-           "city": "delhi",
-           "sports": [
-               "soccer"
-           ]
-       },
-       {
-           "name": "lokesh",
-           "dob": "1/1/1990",
-           "gender": "male",
-           "city": "mumbai",
-           "sports": [
-               "soccer"
-           ]
-       },
-   ]
- 
-   router.post('/players', function (req, res) {
- 
-       //LOGIC WILL COME HER
-       res.send(  { data: players , status: true }  )
-   })
-  
-  
-module.exports = router;
-
-
-
-HW: https://docs.google.com/document/d/1Q1bkf_ruL3qGYOO-rINkVX62GR4Czy_HO6uy1P_9lhM/edit
+    {
+        name:"Five Point Someone",
+        author_id:1,
+        price:50,
+        ratings:4.5,
+    } ,
+    {
+        name:"The 3 Mistakes of My Life",
+        author_id:1,
+        price:50,
+        ratings:4.5,
+    } ,
+    {
+        name:"One Arranged Murder",
+        author_id:1,
+        price:50,
+        ratings:4.5,
+    } ,
+    {
+        name:"Harry Porter",
+        author_id:2,
+        price:50,
+        ratings:4.5,
+    } ,
+    {
+        name:"Harry Porter",
+        author_id:2,
+        price:50,
+        ratings:4.5,
+    }

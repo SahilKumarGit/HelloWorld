@@ -11,7 +11,8 @@ let bookSchema = new mongoose.Schema({
         required: true
     },
     author_id: {
-        type: Number,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'author_db',
         required: true
     },
     ratings: {
