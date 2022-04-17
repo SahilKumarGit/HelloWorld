@@ -1,10 +1,11 @@
 const publisherSchema = require('../models/publisher')
 const authorSchema = require('../models/author')
-const bookSchema = require('../models/book')
+const bookSchema = require('../models/book');
+// const author = require('../models/author');
 
 
 /*---------------------------------------------------------------------------
-1 -> Write a POST api that creates a publisher from the details in the request body
+1 -> Write a POST api that creates an author from the details in request body
 ---------------------------------------------------------------------------*/
 
 const createAuthor = async (req, res) => {
@@ -37,15 +38,8 @@ const createAuthor = async (req, res) => {
 
 
 
-
-
-
-
-
-
-
 /*---------------------------------------------------------------------------
-2 -> Write a POST api that creates an author from the details in request body
+2 -> Write a POST api that creates a publisher from the details in the request body
 ---------------------------------------------------------------------------*/
 
 const createPublisher = async (req, res) => {
@@ -229,7 +223,111 @@ const bookList = async (req, res) => {
 
 
 
+
+
+
+
+
+
+
+
+
+
+/*---------------------------------------------------------------------------
+5.1 -> Add a new boolean attribute in the book schema called isHardCover with a default false value. 
+    For the books published by 'Penguin' and 'HarperCollins', update this key to true.
+
+5.2 -> For the books written by authors having a rating greater than 3.5, 
+    update the books price by 10 (For eg if old price for such a book is 50, new will be 60) 
+---------------------------------------------------------------------------*/
+const bookupdate1 = async (req, res) => {
+
+
+    // 5.1 -------------------------------------------------------------
+
+
+    // get Penguin s ID
+    let PenguinID = await publisherSchema.findOne({
+        name: 'Penguin'
+    }).then((success) => {
+        return success !== null ? success._id : null;
+    }, (err) => {
+        return null
+    })
+
+    //get HarperCollins ID
+    let HarperCollinsID = await publisherSchema.findOne({
+        name: 'HarperCollins'
+    }).then((success) => {
+        return success !== null ? success._id : null;
+    }, (err) => {
+        return null
+    })
+
+    // update book isHardCover data
+    let update1 = await bookSchema.updateMany({
+        publisher: {
+            $in: [PenguinID, HarperCollinsID]
+        }
+    }, {
+        $set: {
+            isHardCover: true
+        }
+    }).then((success) => {
+        return success
+    }, (err) => {
+        return err.message
+    })
+
+    //give output to client 😎
+    res.send({
+        status: true,
+        message: update1
+    });
+}
+
+
+const bookupdate2 = async (req, res) => {
+    // get auther list which rating >= 3.5
+    let authArr = await authorSchema.find({
+        rating: {
+            $gte: 3.5
+        }
+    })
+
+    let idsArr = [];
+    authArr.forEach((each) => {
+        idsArr.push(each._id)
+    })
+
+    // find books related rattings
+    let bookData = await bookSchema.updateMany({
+        author: {
+            $in: idsArr
+        }
+    }, {
+        $inc: {
+            price: +10
+        }
+    })
+    //give output to client 😎
+    res.send({
+        status: true,
+        message: bookData
+    });
+}
+
+
+
+
+
+
+
+
+
 module.exports.createAuthor = createAuthor
 module.exports.createPublisher = createPublisher
 module.exports.createBook = createBook
 module.exports.bookList = bookList
+module.exports.bookupdate1 = bookupdate1
+module.exports.bookupdate2 = bookupdate2
