@@ -58,6 +58,7 @@ const scholarshipDevelopers = async (req, res) => {
     Please note the batch name and the program values are received in the request as query params.*/
 
 const devlopers = async (req, res) => {
+    // console.log(req.socket.remoteAddress)
     let data = req.query;
     let batch = await batchModule.find({
         program: data.program
