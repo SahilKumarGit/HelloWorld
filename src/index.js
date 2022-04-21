@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({
 }));
 
 //connect mongo db
-mongoose.connect("mongodb+srv://firstDB:zwPu7dwJG0RCXU9f@cluster0.kgij2.mongodb.net/sahil99?retryWrites=true&w=majority", {
+mongoose.connect("mongodb+srv://firstDB:zwPu7dwJG0RCXU9f@cluster0.kgij2.mongodb.net/hello?retryWrites=true&w=majority", {
     useNewUrlParser: true
 }).then((data) => {
     console.log('mongoDB: 🎉 Good To Go...');
