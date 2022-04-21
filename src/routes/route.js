@@ -1,13 +1,16 @@
 const express = require('express');
-const bookController = require('../controllers/all')
 const router = express.Router();
+const checkHeader = require('../Middleware/headerValidation')
+const allCollection = require('../controllers/all')
+
+router.post('/createProduct', allCollection.createProduct);
 
 
+router.post('/createUser', checkHeader, allCollection.createUser);
 
-router.post('/createBatch', bookController.createBatch)
-router.post('/createDevloper', bookController.createDevloper)
-router.get('/scholarship-developers', bookController.scholarshipDevelopers)
-router.get('/developers', bookController.devlopers)
+
+router.post('/placeOrder', checkHeader, allCollection.placeOrder);
+
 
 
 module.exports = router;

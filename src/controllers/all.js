@@ -1,93 +1,145 @@
-const batchModule = require('../models/batchModule');
-const devloperModule = require('../models/devloperModule');
+const userModule = require("../models/userModule")
+const productModule = require("../models/productModule")
+const orderModule = require("../models/orderModule")
+const moment = require('moment')
 
 
-/*1.  Write an api POST /batches that creates a batch from the details in the request body. 
-    Please note that the program should be an enum with the following allowed values only - backend and frontend */
-
-const createBatch = async (req, res) => {
-    // 
-    let data = req.body;
-    let output = await batchModule.create(data);
-    res.send({
-        message: output
-    })
+/*Q1. */
+const createProduct = async (req, res) => {
+    const data = req.body;
+    // create product and save to DB
+    const createProduct = await productModule.create(data).then((success) => {
+        return {
+            status: true,
+            data: success
+        }
+    }, (err) => {
+        return {
+            status: false,
+            data: err.message
+        }
+    });
+    res.send(createProduct)
 }
 
 
-/*2. Write an api POST  /developers that creates a developer from the details in the request body. 
-    Please note that the gender should be an enum with the following allowed values 
-    - male, female and other. Also, batch attribute is a reference to the batches collection.*/
+/*Q2. */
 
-const createDevloper = async (req, res) => {
-    // 
-    let data = req.body;
-    // check batch OBJID
-    let batch = await batchModule.findById(data.batch)
-    if (!batch) {
+const createUser = async (req, res) => {
+    // get body
+    const data = req.body;
+    //get isFreeAppUser data 
+    data.isFreeAppUser = req.isFreeAppUser;
+    // create product
+    const createUser = await userModule.create(data).then((success) => {
+        return {
+            status: true,
+            data: success
+        }
+    }, (err) => {
+        return {
+            status: false,
+            data: err.message
+        }
+    })
+    res.send(createUser)
+}
+
+
+
+
+/*Q3 */
+
+const placeOrder = async (req, res) => {
+    // get body data 
+    const data = req.body;
+    //get isFreeAppUser 
+    const isFreeAppUser = req.isFreeAppUser;
+
+    if (!data.userId) {
         return res.send({
-            message: "batch id NOT valid!"
+            status: false,
+            data: "😔 user id is NOT defined"
         })
     }
-    let output = await devloperModule.create(data);
-    res.send({
-        message: output
-    })
-}
 
-
-/*3. Write an api GET /scholarship-developers that fetches the list of eligible developers for scholarship. 
-    An eligible developer is female with percentage greater than or equal to 70*/
-
-const scholarshipDevelopers = async (req, res) => {
-    let output = await devloperModule.find({
-        gender: "female",
-        percentage: {
-            $gte: 70
-        }
-    }).populate('batch')
-    res.send({
-        message: output
-    })
-}
-
-
-
-/*4. Write an api GET /developers?percentage=value1&program=value2 that only returns the developers 
-    for a given program with a percentage greater than or equal to the received value. 
-    Please note the batch name and the program values are received in the request as query params.*/
-
-const devlopers = async (req, res) => {
-    // console.log(req.socket.remoteAddress)
-    let data = req.query;
-    let batch = await batchModule.find({
-        program: data.program
-    })
-
-    if (!batch) {
+    if (!data.productId) {
         return res.send({
-            message: "No Batch exist related to this program name."
+            status: false,
+            data: "😔 product id is NOT defined"
         })
     }
-    let batchID = batch.map((x) => {
-        return x._id
-    })
 
-    let output = await devloperModule.find({
-        percentage: {
-            $gte: data.percentage
-        },
-        batch: {
-            $in: batchID
+    // validate data for user
+    const userData = await userModule.findById(data.userId).catch(arr => null);
+    if (!userData) {
+        return res.send({
+            status: false,
+            data: "😔 invalid user id, please enter a currect user id !"
+        })
+    }
+
+    // validate data for product
+    const productData = await productModule.findById(data.productId).catch(arr => null);
+    if (!productData) {
+        return res.send({
+            status: false,
+            data: "😔 invalid product id, please enter a currect product id !"
+        })
+    }
+
+    let productPrice = 0;
+
+    // check header value of isFreeAppUser
+    if (!isFreeAppUser) { //false
+        // check user balance < product
+        if (userData.balance < productData.price) {
+            return res.send({
+                status: false,
+                data: `😔 insufficient balance, product price is ₹${productData.price} but your balance is ₹${userData.balance} !`
+            })
         }
-    }).populate('batch')
 
-    res.send({
-        message: output
+        // update user balance
+        await userModule.findOneAndUpdate({
+            _id: userData._id
+        }, {
+            $inc: {
+                balance: -productData.price
+            }
+        })
+
+        // update bookPrice
+        productPrice = productData.price
+    }
+
+    // create order field and value
+    const orderData = {
+        userId: userData._id,
+        productId: productData._id,
+        amount: productPrice,
+        isFreeAppUser: isFreeAppUser,
+        date: moment().format('DD/MM/YYYY')
+    }
+
+    const createOrder = await orderModule.create(orderData).then((success) => {
+        return {
+            status: true,
+            data: success
+        }
+    }, (err) => {
+        return {
+            status: false,
+            data: err.message
+        }
     })
+
+
+    res.send(createOrder)
 }
 
-module.exports.createBatch = createBatch
-module.exports.createDevloper = createDevloper
-module.exports.scholarshipDevelopers = scholarshipDevelopers
-module.exports.devlopers = devlopers
+
+
+module.exports.createUser = createUser
+module.exports.createProduct = createProduct
+module.exports.placeOrder = placeOrder

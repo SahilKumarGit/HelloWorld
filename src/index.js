@@ -2,7 +2,6 @@ const express = require('express');
 var bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const route = require('./routes/route.js');
-const generateLog = require('./Middleware/getLog')
 
 const app = express();
 
@@ -21,7 +20,7 @@ mongoose.connect("mongodb+srv://firstDB:zwPu7dwJG0RCXU9f@cluster0.kgij2.mongodb.
     console.error(err);
 });
 
-app.use(generateLog);
+
 app.use('/', route);
 
 app.listen(process.env.PORT || 3000, function () {
