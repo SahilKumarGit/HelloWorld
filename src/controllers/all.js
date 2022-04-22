@@ -8,14 +8,16 @@ const registration = async (req, res) => {
     const data = req.body;
     // 😎 now we need to create a new document in our user collection
     const userCreate = await userModule.create(data).then((success) => {
+        res.status(201)
         return {
             ststus: true,
             data: success
         }
     }, (error) => {
+        res.status(500)
         return {
-            ststus: true,
-            data: error.message
+            ststus: false,
+            msg: error.message
         }
     })
 
@@ -36,7 +38,7 @@ const login = async (req, res) => {
     const data = req.body;
     // 😎 check if email exist or not
     if (!data.emailId || data.emailId == "") {
-        return res.send({
+        return res.status(400).send({
             ststus: false,
             msg: "email ID undefind OR it is a empty value"
         })
@@ -44,7 +46,7 @@ const login = async (req, res) => {
 
     // 😎 check if password exist or not
     if (!data.password || data.password == "") {
-        return res.send({
+        return res.status(400).send({
             ststus: false,
             msg: "password undefind OR it is a empty value"
         })
@@ -57,7 +59,7 @@ const login = async (req, res) => {
         isDeleted: false
     });
     if (!userCheck) {
-        return res.send({
+        return res.status(401).send({
             ststus: false,
             msg: "Wrong email id OR password"
         })
@@ -65,21 +67,15 @@ const login = async (req, res) => {
 
 
     //🔑 generate JWT here key
-    const token = await jwt.sign({
+    const token = jwt.sign({
         user: userCheck._id.toString()
     }, 'asdfghjkl_myKey');
 
-    if (!token) {
-        return res.send({
-            ststus: false,
-            msg: "Something went worng, Can't generate token"
-        })
-    }
-
-    res.send({
+    return res.status(200).send({
         ststus: true,
         data: token
     })
+
 }
 
 
@@ -104,12 +100,12 @@ const users = async (req, res) => {
 
     // 👎 error handel if data not found or if Null
     if (!userInfo) {
-        return res.send({
+        return res.status(400).send({
             ststus: false,
             msg: "User info Unavalable"
         })
     }
-    res.send({
+    res.status(200).send({
         ststus: true,
         data: userInfo
     })
@@ -130,9 +126,15 @@ const userUpdate = async (req, res) => {
     // 😎 first we need to get params data
     const userId = req.params.userId;
     const data = req.body;
+    if (!data || Object.keys(data).length === 0) {
+        return res.status(400).send({
+            ststus: false,
+            msg: "Required body key and value."
+        })
+    }
 
     // 🔍 find data related userId
-    const userInfo = await userModule.findOneAndUpdate({
+    const updateInfoVar = await userModule.findOneAndUpdate({
         _id: userId,
         isDeleted: false
     }, {
@@ -142,15 +144,15 @@ const userUpdate = async (req, res) => {
     }).catch(err => null)
 
     // 👎 error handel if data not found or if Null
-    if (!userInfo) {
-        return res.send({
+    if (!updateInfoVar) {
+        return res.status(400).send({
             ststus: false,
             msg: "Can't update, User info Unavalable OR the user already deleted"
         })
     }
-    res.send({
+    res.status(200).send({
         ststus: true,
-        data: userInfo
+        data: updateInfoVar
     })
 }
 
@@ -181,16 +183,20 @@ const userDelete = async (req, res) => {
 
     // 👎 error handel if data not found or if Null
     if (!userInfo) {
-        return res.send({
+        return res.status(400).send({
             ststus: false,
             msg: "Somthing wents worng, the user not exist or already deleted"
         })
     }
-    res.send({
+    res.status(200).send({
         ststus: true,
         data: userInfo
     })
 }
+
+
+
+
 
 
 
